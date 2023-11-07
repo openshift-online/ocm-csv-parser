@@ -28,7 +28,7 @@ func init() {
 		"output",
 		"o",
 		"output/cloud-resources.configmap.yaml",
-		"The path-to-file for the CSV that is being parsed",
+		"This defines the path + filename of the output (yaml configmap)",
 	)
 }
 
