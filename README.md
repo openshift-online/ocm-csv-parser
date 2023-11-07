@@ -12,3 +12,6 @@ Then, run `go build`
 `ocm-csv-parser parse` parses the CSV file in `/tmp/`, or, a specific file using a full path with the `--file / -f` flag, then deletes the temporary file in `/tmp/` if used
 
 You can also specify the output directory / filename using `--output / -o`. Example: `ocm-csv-parser parse --output ~/Documents/my_file.configmap.yaml`
+
+## Testing
+Go into the `pkg` directory (`cd pkg`) and run `ginkgo` to run unit tests

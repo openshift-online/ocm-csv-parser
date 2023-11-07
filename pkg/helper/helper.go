@@ -1,8 +1,8 @@
 package helper
 
-func AssignValue(value interface{}) interface{} {
+func AssignStringValue(value interface{}) string {
 	if value == nil {
 		return ""
 	}
-	return value
+	return value.(string)
 }
