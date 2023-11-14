@@ -61,7 +61,7 @@ func ResourcesToYamlMachineTypes(resources []map[string]interface{}, outputFile 
 	// Machine types
 	i := 0
 	_, err = file.Write([]byte("---\napiVersion: v1\nkind: ConfigMap\nmetadata:\n  " +
-		"name: cloud-resources-config\ndata:\n  instance-types.yaml: |\n    instance_types:\n"))
+	"annotations:\n    " + "qontract.recycle: \"true\"\n  " + "name: cloud-resources-config\ndata:\n  instance-types.yaml: |\n    instance_types:\n"))
 	if err != nil {
 		panic(err)
 	}
