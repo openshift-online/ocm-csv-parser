@@ -7,9 +7,11 @@ Run `go mod tidy`
 Then, run `go build`
 
 ## Usage
-`ocm-csv-parser download` downloads the CSV file from Google Sheets and places in `/tmp/`. Not yet finished
+`ocm-csv-parser download` downloads the CSV file from Google Sheets and places in `/tmp/`. Not yet finished.
 
-`ocm-csv-parser parse [command]` parses the CSV file in `/tmp/`, or, a specific file using a full path with the `--file / -f` flag, then deletes the temporary file in `/tmp/` if used
+(If you download the csv yourself, rename it to `cloudresources.csv` for the next step)
+
+`ocm-csv-parser parse [command]` parses the CSV file as `/tmp/cloudresources.csv`, or, a specific file using a full path with the `--file / -f` flag, then deletes the temporary file in `/tmp/` if used
 
 Options for `[command]` are the following:
 * `ocm-csv-parser parse machinetypes`
