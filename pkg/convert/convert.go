@@ -11,7 +11,7 @@ import (
 	"github.com/openshift-online/ocm-csv-parser/pkg/validations"
 )
 
-func CsvToResources(resourcesFile string) ([]map[string]interface{}, error) {
+func MachineTypesCsvToResources(resourcesFile string) ([]map[string]interface{}, error) {
 	finalResources := make([]map[string]interface{}, 0)
 	csvFile, err := os.Open(resourcesFile)
 	if err != nil {
@@ -44,6 +44,79 @@ func CsvToResources(resourcesFile string) ([]map[string]interface{}, error) {
 	return finalResources, nil
 }
 
+func RegionsCsvToResources(resourcesFile string) ([]map[string]interface{}, error) {
+	finalResources := make([]map[string]interface{}, 0)
+	csvFile, err := os.Open(resourcesFile)
+	if err != nil {
+		return nil, err
+	}
+	defer csvFile.Close()
+
+	reader := csv.NewReader(csvFile)
+	records, err := reader.ReadAll()
+	if err != nil {
+		return nil, err
+	}
+
+	keys := []string{Id, CloudProviderId, DisplayName, SupportsMultiAz}
+
+	// Parse resources from CSV
+	for _, record := range records {
+		resource := make(map[string]interface{})
+		for i, key := range keys {
+			resource[key] = record[i]
+		}
+		finalResources = append(finalResources, resource)
+	}
+
+	if err := validations.ValidateRegions(finalResources); err != nil {
+		return nil, err
+	}
+
+	return finalResources, nil
+}
+
+func ResourcesToYamlRegions(resources []map[string]interface{}, outputFile string) error {
+
+	// Create output file if 1) it does not exist and 2) if the file is intended to be placed there
+	if strings.HasPrefix(outputFile, "output/") {
+		err := os.Mkdir("output", 0777)
+		if err != nil && !strings.Contains(err.Error(), "mkdir output: file exists") {
+			return err
+		}
+	}
+
+	file, err := os.Create(outputFile)
+	if err != nil {
+		return err
+	}
+
+	// Regions
+	_, err = file.Write([]byte("---\napiVersion: v1\nkind: ConfigMap\nmetadata:\n  " +
+		"annotations:\n    " + "qontract.recycle: \"true\"\n  " + "name: cloud-resources-config\ndata:\n  cloud-regions.yaml: |\n    cloud_regions:\n"))
+	if err != nil {
+		panic(err)
+	}
+	for i, resource := range resources {
+		if i == 0 {
+			continue
+		}
+		// Create block for this region
+		id := helper.AssignStringValue(resource["id"])
+		regionString := []byte(fmt.Sprintf(
+			"    - id: %s\n"+
+				"      cloud_provider_id: %s\n"+
+				"      display_name: %s\n"+
+				"      supports_multi_az: %s\n",
+			id, resource[CloudProviderId].(string), resource[DisplayName].(string), resource[SupportsMultiAz].(string)))
+		_, err = file.Write(regionString)
+		if err != nil {
+			panic(err)
+		}
+	}
+	return nil
+}
+
 func ResourcesToYamlMachineTypes(resources []map[string]interface{}, outputFile string) error {
 
 	// Create output file if 1) it does not exist and 2) if the file is intended to be placed there
@@ -62,7 +135,7 @@ func ResourcesToYamlMachineTypes(resources []map[string]interface{}, outputFile 
 	// Machine types
 	i := 0
 	_, err = file.Write([]byte("---\napiVersion: v1\nkind: ConfigMap\nmetadata:\n  " +
-	"annotations:\n    " + "qontract.recycle: \"true\"\n  " + "name: cloud-resources-config\ndata:\n  instance-types.yaml: |\n    instance_types:\n"))
+		"annotations:\n    " + "qontract.recycle: \"true\"\n  " + "name: cloud-resources-config\ndata:\n  instance-types.yaml: |\n    instance_types:\n"))
 	if err != nil {
 		panic(err)
 	}

@@ -13,4 +13,6 @@ const (
 	SizePretty      = "size_pretty"
 	ResourceType    = "resource_type"
 	Active          = "active"
+	DisplayName     = "display_name"
+	SupportsMultiAz = "supports_multi_az"
 )

@@ -17,6 +17,8 @@ const (
 apiVersion: v1
 kind: ConfigMap
 metadata:
+  annotations:
+    qontract.recycle: "true"
   name: cloud-resources-config
 data:
   instance-types.yaml: |
@@ -46,7 +48,7 @@ var _ = Describe("Pkg", func() {
 		})
 		It("Convert single resource from CSV into YAML", func() {
 			var err error
-			machineTypes, err = convert.CsvToResources("test/test.csv")
+			machineTypes, err = convert.MachineTypesCsvToResources("test/test.csv")
 			Expect(err).ToNot(HaveOccurred())
 			machineType := machineTypes[0]
 			Expect(machineType[Id]).To(Equal(machineTypeId))
@@ -78,11 +80,11 @@ var _ = Describe("Pkg", func() {
 		})
 		It("Fail for each field supplied with the wrong data type", func() {
 			// Check function which is to be used by the parse command
-			machineTypes, err := convert.CsvToResources("test/badDataTypes.csv")
+			machineTypes, err := convert.MachineTypesCsvToResources("test/badDataTypes.csv")
 			Expect(err).To(HaveOccurred())
 			Expect(machineTypes).To(BeNil())
 			// Check each specific field validation
-			machineTypes, err = convert.CsvToResources("test/test.csv")
+			machineTypes, err = convert.MachineTypesCsvToResources("test/test.csv")
 			Expect(err).ToNot(HaveOccurred())
 			machineType := machineTypes[0]
 			machineTypeId := machineType[Id].(string)
@@ -101,6 +103,29 @@ var _ = Describe("Pkg", func() {
 			Expect(makeFakeMachineTypeDataType(machineType, Name, 1234).Error()).
 				To(Equal(fakeDataTypeValidationError(machineTypeId, Name).Error()))
 		})
+		It("Fail for missing cloud provider ID with regions", func() {
+			cloudRegions, err := convert.RegionsCsvToResources("test/testMissingCloudProvider.csv")
+			Expect(err).To(HaveOccurred())
+			Expect(cloudRegions).To(BeNil())
+			Expect(err.Error()).To(Equal(fakeMissingDataError("eastasia", CloudProviderId).Error()))
+		})
+		It("Pass for non-missing cloud provider ID with regions", func() {
+			cloudRegions, err := convert.RegionsCsvToResources("test/testCloudRegions.csv")
+			Expect(err).ToNot(HaveOccurred())
+			Expect(cloudRegions).ToNot(BeNil())
+			Expect(cloudRegions[0][Id].(string)).To(Equal("eastasia"))
+			Expect(cloudRegions[0][CloudProviderId].(string)).To(Equal("azure"))
+			Expect(cloudRegions[0][DisplayName].(string)).To(Equal("East Asia"))
+			Expect(cloudRegions[0][SupportsMultiAz]).To(Equal("true"))
+			Expect(cloudRegions[1][Id].(string)).To(Equal("eastasia2"))
+			Expect(cloudRegions[1][CloudProviderId].(string)).To(Equal("gcp"))
+			Expect(cloudRegions[1][DisplayName].(string)).To(Equal("East Asia 2"))
+			Expect(cloudRegions[1][SupportsMultiAz]).To(Equal("false"))
+			Expect(cloudRegions[2][Id].(string)).To(Equal("eastasia3"))
+			Expect(cloudRegions[2][CloudProviderId].(string)).To(Equal("aws"))
+			Expect(cloudRegions[2][DisplayName].(string)).To(Equal("East Asia 3"))
+			Expect(cloudRegions[2][SupportsMultiAz]).To(Equal("true"))
+		})
 	})
 })
 
@@ -112,4 +137,8 @@ func makeFakeMachineTypeDataType(machineType map[string]interface{}, field strin
 
 func fakeDataTypeValidationError(resourceId, resourceField string) error {
 	return errors.UserErrorf(errormsgs.SyntaxDataType, resourceId, resourceField)
+}
+
+func fakeMissingDataError(resourceId, resourceField string) error {
+	return errors.UserErrorf(errormsgs.EmptyRequiredField, resourceField, resourceId)
 }
