@@ -2,6 +2,7 @@ package parse
 
 import (
 	"github.com/openshift-online/ocm-csv-parser/cmd/parse/machinetypes"
+	"github.com/openshift-online/ocm-csv-parser/cmd/parse/regions"
 	"github.com/spf13/cobra"
 )
 
@@ -14,4 +15,5 @@ var Cmd = &cobra.Command{
 
 func init() {
 	Cmd.AddCommand(machinetypes.Cmd)
+	Cmd.AddCommand(regions.Cmd)
 }

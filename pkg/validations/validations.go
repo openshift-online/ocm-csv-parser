@@ -52,12 +52,42 @@ func validateMachineTypeDataTypes(resource map[string]interface{}) error {
 	return nil
 }
 
+func validateRegionDataTypes(resource map[string]interface{}) error {
+	resourceId := resource[Id].(string)
+	if resource[CloudProviderId] == "" {
+		return errors.UserErrorf(errormsgs.EmptyRequiredField, CloudProviderId, resourceId)
+	}
+	if err := validateDataType(resourceId, CloudProviderId, resource[CloudProviderId],
+		reflect.TypeOf("")); err != nil {
+		return err
+	}
+	if err := validateDataType(resourceId, DisplayName, resource[DisplayName],
+		reflect.TypeOf("")); err != nil {
+		return err
+	}
+	if err := validateDataType(resourceId, SupportsMultiAz, resource[SupportsMultiAz],
+		reflect.TypeOf("")); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func ValidateMachineTypes(resources []map[string]interface{}) error {
 	for _, resource := range resources {
 		if resource[ResourceType] == "compute.node" {
 			if err := validateMachineTypeDataTypes(resource); err != nil {
 				return err
 			}
+		}
+	}
+	return nil
+}
+
+func ValidateRegions(resources []map[string]interface{}) error {
+	for _, resource := range resources {
+		if err := validateRegionDataTypes(resource); err != nil {
+			return err
 		}
 	}
 	return nil
