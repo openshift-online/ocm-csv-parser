@@ -154,7 +154,10 @@ func ResourcesToYamlRegions(resources []map[string]interface{}, outputFile strin
 		for scanner.Scan() {
 			text := scanner.Text()
 			if strings.Contains(text, "cloud_regions:") {
-				finalText += fmt.Sprintf("%s\n%s\n", text, newConfigmap)
+				finalText += fmt.Sprintf("%s\n%s", text, newConfigmap)
+				if !strings.HasSuffix(newConfigmap, "\n") {
+					finalText += "\n"
+				}
 				break
 			} else {
 				finalText += fmt.Sprintf("%s\n", text)
