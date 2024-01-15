@@ -1,0 +1,2 @@
+id,generic_name,name,cloud,cpu_cores,memory,memory_pretty,category,category_pretty,size_pretty,resource_type,active
+g4dn.12xlarge,t4-gpu-48,g4dn.12xlarge - Accelerated Computing (4 GPUs),aws,48,206158430208,192,accelerated_computing,Accelerated Computing,12xlarge,compute.node,TRUE
