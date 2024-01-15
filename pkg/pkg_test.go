@@ -56,7 +56,7 @@ var _ = Describe("Pkg", func() {
 			Expect(machineType[CpuCores]).To(Equal("48"))
 		})
 		It("Convert parsed resource into yaml", func() {
-			err := convert.ResourcesToYamlMachineTypes(machineTypes, outputFile)
+			err := convert.ResourcesToYamlMachineTypes(machineTypes, outputFile, "")
 			Expect(err).ToNot(HaveOccurred())
 			testFile, err := os.ReadFile(outputFile)
 
@@ -65,7 +65,7 @@ var _ = Describe("Pkg", func() {
 			Expect(string(testFile)).To(Equal(testOutputFile))
 		})
 		It("Test output file creation", func() {
-			err := convert.ResourcesToYamlMachineTypes(machineTypes, "output/test.configmap.yaml")
+			err := convert.ResourcesToYamlMachineTypes(machineTypes, "output/test.configmap.yaml", "")
 			Expect(err).ToNot(HaveOccurred())
 			file, err := os.ReadFile("output/test.configmap.yaml")
 			Expect(err).ToNot(HaveOccurred())
@@ -75,7 +75,7 @@ var _ = Describe("Pkg", func() {
 			err = os.Remove("output")
 			Expect(err).ToNot(HaveOccurred())
 			// File creation should only happen for the 'default' option (same dir, inside a dir called 'output')
-			err = convert.ResourcesToYamlMachineTypes(machineTypes, "otpt/test.configmap.yaml")
+			err = convert.ResourcesToYamlMachineTypes(machineTypes, "otpt/test.configmap.yaml", "")
 			Expect(err).To(HaveOccurred())
 		})
 		It("Fail for each field supplied with the wrong data type", func() {
@@ -125,6 +125,26 @@ var _ = Describe("Pkg", func() {
 			Expect(cloudRegions[2][CloudProviderId].(string)).To(Equal("aws"))
 			Expect(cloudRegions[2][DisplayName].(string)).To(Equal("East Asia 3"))
 			Expect(cloudRegions[2][SupportsMultiAz]).To(Equal("true"))
+		})
+		It("Test full app-interface flow", func() {
+			var err error
+			machineTypes, err = convert.MachineTypesCsvToResources("test/app-interface-machine-types-test.csv")
+			Expect(err).ToNot(HaveOccurred())
+			err = convert.ResourcesToYamlMachineTypes(machineTypes, "", "test/")
+			Expect(err).ToNot(HaveOccurred())
+
+			cloudRegions, err := convert.RegionsCsvToResources("test/app-interface-regions-test.csv")
+			Expect(err).ToNot(HaveOccurred())
+			err = convert.ResourcesToYamlRegions(cloudRegions, "", "test/")
+			Expect(err).ToNot(HaveOccurred())
+
+			output, err := os.ReadFile("test/resources/services/ocm/cloud-resources.configmap.yaml")
+			Expect(err).ToNot(HaveOccurred())
+
+			expected, err := os.ReadFile("test/after-testing-app-interface.configmap.yaml")
+			Expect(err).ToNot(HaveOccurred())
+
+			Expect(string(output)).To(Equal(string(expected)))
 		})
 	})
 })

@@ -18,5 +18,20 @@ Options for `[command]` are the following:
 
 You can also specify the output directory / filename using `--output / -o`. Example: `ocm-csv-parser parse machinetypes --output ~/Documents/my_file.configmap.yaml`
 
+### Update to usage
+
+If you would like, you can now specify the `--app-interface` flag with the *root directory* of your local app-interface. Doing so will automatically update the configmap within app-interface itself to save time.
+
+Example usage:
+
+`ocm-csv-parser parse regions --file ~/Downloads/new-configmap.csv --app-interface ../app-interface/`
+
+**You can now parse regions**
+
 ## Testing
 Go into the `pkg` directory (`cd pkg`) and run `ginkgo` to run unit tests
+
+## Supported cloud resources
+
+* Cloud Regions
+* Machine/Instance Types

@@ -1,0 +1,2 @@
+id,cloud_provider_id,display_name,supports_multi_az
+eastasia,azure,East Asia,true
