@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/openshift-online/ocm-csv-parser/cmd/download"
+	"github.com/openshift-online/ocm-csv-parser/cmd/edit"
 	"github.com/openshift-online/ocm-csv-parser/cmd/parse"
 	"github.com/openshift-online/ocm-csv-parser/pkg/color"
 	"github.com/spf13/cobra"
@@ -26,8 +26,8 @@ func init() {
 	// Add the command line flags:
 	color.AddFlag(root)
 
-	root.AddCommand(download.Cmd)
 	root.AddCommand(parse.Cmd)
+	root.AddCommand(edit.Cmd)
 }
 
 func main() {
