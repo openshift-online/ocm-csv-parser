@@ -76,3 +76,18 @@ Go into the `pkg` directory (`cd pkg`) and run `ginkgo run` to run unit tests
 
 * Cloud Regions
 * Machine/Instance Types
+
+## Installation
+
+```bash
+go install github.com/openshift-online/ocm-csv-parser@latest
+```
+
+Or build from source:
+
+```bash
+git clone https://github.com/openshift-online/ocm-csv-parser.git
+cd ocm-csv-parser
+go mod tidy
+go build
+```
