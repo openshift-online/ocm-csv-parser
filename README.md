@@ -1,6 +1,13 @@
 # ocm-csv-parser
 Parser CLI to format csv data to be consumed by OCM services
 
+## Quick Start
+
+```bash
+make build       # Build the ocm-csv-parser binary
+make test        # Run tests
+```
+
 ## Build
 
 ---
